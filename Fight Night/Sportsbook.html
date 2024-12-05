@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive Fight Night Sportsbook with bet processing.">
+  <title>Interactive Fight Night Sportsbook</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Fight Night Sportsbook</h1>
+  </header>
+  <main>
+    <section>
+      <h2>Matchups</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Matchup</th>
+            <th>Fighter 1 Odds</th>
+            <th>Fighter 2 Odds</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dilts 165 vs Salgy 170</td>
+            <td>Dilts -120</td>
+            <td>Salgy +110</td>
+          </tr>
+          <tr>
+            <td>Olek 143 vs Schuckman 142</td>
+            <td>Olek -140</td>
+            <td>Schuckman +130</td>
+          </tr>
+          <tr>
+            <td>Austin vs Justin</td>
+            <td>Austin -110</td>
+            <td>Justin -110</td>
+          </tr>
+          <tr>
+            <td>Pean 150 vs Chirite 150</td>
+            <td>Pean +1200</td>
+            <td>Chirite -225</td>
+          </tr>
+          <tr>
+            <td>Cosner 185 vs Wildermuth 180</td>
+            <td>Cosner -115</td>
+            <td>Wildermuth -105</td>
+          </tr>
+          <tr>
+            <td>Hayward 158 vs Borrego 155</td>
+            <td>Hayward +100</td>
+            <td>Borrego -120</td>
+          </tr>
+          <tr>
+            <td>Sans 185 vs Helvey 170</td>
+            <td>Sans -170</td>
+            <td>Helvey +145</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="betting-form">
+      <h2>Place Your Bet</h2>
+      <form>
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+        <br><br>
+        <label for="matchup">Choose Matchup:</label>
+        <select id="matchup">
+          <option value="-120,110,Dilts vs Salgy">Dilts vs Salgy</option>
+          <option value="-140,130,Olek vs Schuckman">Olek vs Schuckman</option>
+          <option value="-110,-110,Austin vs Justin">Austin vs Justin</option>
+          <option value="200,-225,Pean vs Chirite">Pean vs Chirite</option>
+          <option value="-115,-105,Cosner vs Wildermuth">Cosner vs Wildermuth</option>
+          <option value="100,-120,Hayward vs Borrego">Hayward vs Borrego</option>
+          <option value="-170,145,Sans vs Helvey">Sans vs Helvey</option>
+        </select>
+        <br><br>
+        <label for="fighter">Choose Fighter:</label>
+        <select id="fighter">
+          <option value="1">Fighter 1</option>
+          <option value="2">Fighter 2</option>
+        </select>
+        <br><br>
+        <label for="betAmount">Bet Amount ($):</label>
+        <input type="number" id="betAmount" placeholder="Enter your bet" required>
+        <br><br>
+        <button type="button" onclick="processBet()">Place Bet</button>
+      </form>
+      <div class="result" id="result"></div>
+    </section>
+
+    <section class="bets">
+      <h2>Bet Slips</h2>
+      <div id="betSlips"></div>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2024 Fight Night Sportsbook</p>
+  </footer>
+
+  <script>
+    const betSlips = [];
+
+    function processBet() {
+      const name = document.getElementById('name').value;
+      const matchupData = document.getElementById('matchup').value.split(',');
+      const fighter = document.getElementById('fighter').value;
+      const betAmount = parseFloat(document.getElementById('betAmount').value);
+
+      if (!name || isNaN(betAmount) || betAmount <= 0) {
+        document.getElementById('result').innerText = "Please enter valid details.";
+        return;
+      }
+
+      const odds = fighter === "1" ? parseFloat(matchupData[0]) : parseFloat(matchupData[1]);
+      const fighterName = fighter === "1" ? "Fighter 1" : "Fighter 2";
+      const matchup = matchupData[2];
+
+      let payout;
+      if (odds > 0) {
+        payout = betAmount * (odds / 100) + betAmount;
+      } else {
+        payout = betAmount / (Math.abs(odds) / 100) + betAmount;
+      }
+
+      const betSlip = {
+        name,
+        matchup,
+        fighter: fighterName,
+        betAmount: `$${betAmount.toFixed(2)}`,
+        payout: `$${payout.toFixed(2)}`
+      };
+
+      betSlips.push(betSlip);
+      displayBetSlips();
+      document.getElementById('result').innerText = `Bet placed! Potential Payout: $${payout.toFixed(2)}`;
+    }
+
+    function displayBetSlips() {
+      const betSlipsContainer = document.getElementById('betSlips');
+      betSlipsContainer.innerHTML = '';
+
+      betSlips.forEach((bet, index) => {
+        const slip = document.createElement('div');
+        slip.className = 'bet-slip';
+        slip.innerHTML = `
+          <h3>Bet #${index + 1}</h3>
+          <p><strong>Name:</strong> ${bet.name}</p>
+          <p><strong>Matchup:</strong> ${bet.matchup}</p>
+          <p><strong>Fighter:</strong> ${bet.fighter}</p>
+          <p><strong>Amount Wagered:</strong> ${bet.betAmount}</p>
+          <p><strong>Payout:</strong> ${bet.payout}</p>
+        `;
+        betSlipsContainer.appendChild(slip);
+      });
+    }
+  </script>
+</body>
+</html>
